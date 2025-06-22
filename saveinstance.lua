@@ -3,6 +3,269 @@
 --!divine-intellect
 -- https://discord.gg/wx4ThpAsmw
 
+--[[ 
+    INTEGRATED GUI SECTION
+    This GUI is automatically created when the script runs.
+    It allows you to set options and start the saveinstance process interactively.
+    You can close the GUI after use; it will not affect the script's output.
+--]]
+
+local function showSaveInstanceGui(saveinstanceFunc)
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "SaveInstanceGui"
+    gui.ResetOnSpawn = false
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 400, 0, 470)
+    frame.Position = UDim2.new(0.5, -200, 0.5, -235)
+    frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    frame.BorderSizePixel = 0
+    frame.Parent = gui
+
+    local title = Instance.new("TextLabel")
+    title.Text = "Universal SaveInstance GUI"
+    title.Size = UDim2.new(1, 0, 0, 36)
+    title.BackgroundTransparency = 1
+    title.Font = Enum.Font.SourceSansBold
+    title.TextSize = 28
+    title.TextColor3 = Color3.new(1,1,1)
+    title.Parent = frame
+
+    -- Helper to make label+input row
+    local function makeRow(y, labelText, inputObj)
+        local label = Instance.new("TextLabel")
+        label.Text = labelText
+        label.Position = UDim2.new(0, 10, 0, y)
+        label.Size = UDim2.new(0, 180, 0, 26)
+        label.BackgroundTransparency = 1
+        label.TextColor3 = Color3.new(1,1,1)
+        label.Font = Enum.Font.SourceSans
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        label.TextSize = 18
+        label.Parent = frame
+        inputObj.Position = UDim2.new(0, 200, 0, y)
+        inputObj.Size = UDim2.new(0, 180, 0, 26)
+        inputObj.Parent = frame
+    end
+
+    -- Option fields
+    local y = 50
+
+    local safeModeToggle = Instance.new("TextButton")
+    safeModeToggle.Text = "OFF"
+    safeModeToggle.BackgroundColor3 = Color3.fromRGB(90,90,90)
+    safeModeToggle.TextColor3 = Color3.new(1,1,1)
+    safeModeToggle.Font = Enum.Font.SourceSans
+    safeModeToggle.TextSize = 18
+    safeModeToggle.BorderSizePixel = 0
+    local safeMode = false
+    safeModeToggle.MouseButton1Click:Connect(function()
+        safeMode = not safeMode
+        safeModeToggle.Text = safeMode and "ON" or "OFF"
+        safeModeToggle.BackgroundColor3 = safeMode and Color3.fromRGB(27,140,50) or Color3.fromRGB(90,90,90)
+    end)
+    makeRow(y, "SafeMode", safeModeToggle)
+    y = y + 32
+
+    local showStatusToggle = Instance.new("TextButton")
+    showStatusToggle.Text = "ON"
+    showStatusToggle.BackgroundColor3 = Color3.fromRGB(27,140,50)
+    showStatusToggle.TextColor3 = Color3.new(1,1,1)
+    showStatusToggle.Font = Enum.Font.SourceSans
+    showStatusToggle.TextSize = 18
+    showStatusToggle.BorderSizePixel = 0
+    local showStatus = true
+    showStatusToggle.MouseButton1Click:Connect(function()
+        showStatus = not showStatus
+        showStatusToggle.Text = showStatus and "ON" or "OFF"
+        showStatusToggle.BackgroundColor3 = showStatus and Color3.fromRGB(27,140,50) or Color3.fromRGB(90,90,90)
+    end)
+    makeRow(y, "ShowStatus", showStatusToggle)
+    y = y + 32
+
+    local fileNameBox = Instance.new("TextBox")
+    fileNameBox.Text = "MyExport"
+    fileNameBox.BackgroundColor3 = Color3.fromRGB(60,60,60)
+    fileNameBox.TextColor3 = Color3.new(1,1,1)
+    fileNameBox.Font = Enum.Font.SourceSans
+    fileNameBox.TextSize = 18
+    fileNameBox.BorderSizePixel = 0
+    makeRow(y, "File Name", fileNameBox)
+    y = y + 32
+
+    local timeoutBox = Instance.new("TextBox")
+    timeoutBox.Text = "10"
+    timeoutBox.BackgroundColor3 = Color3.fromRGB(60,60,60)
+    timeoutBox.TextColor3 = Color3.new(1,1,1)
+    timeoutBox.Font = Enum.Font.SourceSans
+    timeoutBox.TextSize = 18
+    timeoutBox.BorderSizePixel = 0
+    makeRow(y, "Timeout (sec)", timeoutBox)
+    y = y + 32
+
+    local decomptypeBox = Instance.new("TextBox")
+    decomptypeBox.Text = ""
+    decomptypeBox.BackgroundColor3 = Color3.fromRGB(60,60,60)
+    decomptypeBox.TextColor3 = Color3.new(1,1,1)
+    decomptypeBox.Font = Enum.Font.SourceSans
+    decomptypeBox.TextSize = 18
+    decomptypeBox.BorderSizePixel = 0
+    makeRow(y, "Decomp Type", decomptypeBox)
+    y = y + 32
+
+    local noscriptsToggle = Instance.new("TextButton")
+    noscriptsToggle.Text = "OFF"
+    noscriptsToggle.BackgroundColor3 = Color3.fromRGB(90,90,90)
+    noscriptsToggle.TextColor3 = Color3.new(1,1,1)
+    noscriptsToggle.Font = Enum.Font.SourceSans
+    noscriptsToggle.TextSize = 18
+    noscriptsToggle.BorderSizePixel = 0
+    local noscripts = false
+    noscriptsToggle.MouseButton1Click:Connect(function()
+        noscripts = not noscripts
+        noscriptsToggle.Text = noscripts and "ON" or "OFF"
+        noscriptsToggle.BackgroundColor3 = noscripts and Color3.fromRGB(27,140,50) or Color3.fromRGB(90,90,90)
+    end)
+    makeRow(y, "No Scripts", noscriptsToggle)
+    y = y + 32
+
+    local scriptcacheToggle = Instance.new("TextButton")
+    scriptcacheToggle.Text = "ON"
+    scriptcacheToggle.BackgroundColor3 = Color3.fromRGB(27,140,50)
+    scriptcacheToggle.TextColor3 = Color3.new(1,1,1)
+    scriptcacheToggle.Font = Enum.Font.SourceSans
+    scriptcacheToggle.TextSize = 18
+    scriptcacheToggle.BorderSizePixel = 0
+    local scriptcache = true
+    scriptcacheToggle.MouseButton1Click:Connect(function()
+        scriptcache = not scriptcache
+        scriptcacheToggle.Text = scriptcache and "ON" or "OFF"
+        scriptcacheToggle.BackgroundColor3 = scriptcache and Color3.fromRGB(27,140,50) or Color3.fromRGB(90,90,90)
+    end)
+    makeRow(y, "ScriptCache", scriptcacheToggle)
+    y = y + 32
+
+    local saveBytecodeToggle = Instance.new("TextButton")
+    saveBytecodeToggle.Text = "OFF"
+    saveBytecodeToggle.BackgroundColor3 = Color3.fromRGB(90,90,90)
+    saveBytecodeToggle.TextColor3 = Color3.new(1,1,1)
+    saveBytecodeToggle.Font = Enum.Font.SourceSans
+    saveBytecodeToggle.TextSize = 18
+    saveBytecodeToggle.BorderSizePixel = 0
+    local saveBytecode = false
+    saveBytecodeToggle.MouseButton1Click:Connect(function()
+        saveBytecode = not saveBytecode
+        saveBytecodeToggle.Text = saveBytecode and "ON" or "OFF"
+        saveBytecodeToggle.BackgroundColor3 = saveBytecode and Color3.fromRGB(27,140,50) or Color3.fromRGB(90,90,90)
+    end)
+    makeRow(y, "Save Bytecode", saveBytecodeToggle)
+    y = y + 32
+
+    local ignoreDefaultPropsToggle = Instance.new("TextButton")
+    ignoreDefaultPropsToggle.Text = "ON"
+    ignoreDefaultPropsToggle.BackgroundColor3 = Color3.fromRGB(27,140,50)
+    ignoreDefaultPropsToggle.TextColor3 = Color3.new(1,1,1)
+    ignoreDefaultPropsToggle.Font = Enum.Font.SourceSans
+    ignoreDefaultPropsToggle.TextSize = 18
+    ignoreDefaultPropsToggle.BorderSizePixel = 0
+    local ignoreDefaultProps = true
+    ignoreDefaultPropsToggle.MouseButton1Click:Connect(function()
+        ignoreDefaultProps = not ignoreDefaultProps
+        ignoreDefaultPropsToggle.Text = ignoreDefaultProps and "ON" or "OFF"
+        ignoreDefaultPropsToggle.BackgroundColor3 = ignoreDefaultProps and Color3.fromRGB(27,140,50) or Color3.fromRGB(90,90,90)
+    end)
+    makeRow(y, "Ignore Default Props", ignoreDefaultPropsToggle)
+    y = y + 32
+
+    local ignoreNotArchivableToggle = Instance.new("TextButton")
+    ignoreNotArchivableToggle.Text = "ON"
+    ignoreNotArchivableToggle.BackgroundColor3 = Color3.fromRGB(27,140,50)
+    ignoreNotArchivableToggle.TextColor3 = Color3.new(1,1,1)
+    ignoreNotArchivableToggle.Font = Enum.Font.SourceSans
+    ignoreNotArchivableToggle.TextSize = 18
+    ignoreNotArchivableToggle.BorderSizePixel = 0
+    local ignoreNotArchivable = true
+    ignoreNotArchivableToggle.MouseButton1Click:Connect(function()
+        ignoreNotArchivable = not ignoreNotArchivable
+        ignoreNotArchivableToggle.Text = ignoreNotArchivable and "ON" or "OFF"
+        ignoreNotArchivableToggle.BackgroundColor3 = ignoreNotArchivable and Color3.fromRGB(27,140,50) or Color3.fromRGB(90,90,90)
+    end)
+    makeRow(y, "Ignore NotArchivable", ignoreNotArchivableToggle)
+    y = y + 32
+
+    -- Save Button
+    local saveButton = Instance.new("TextButton", frame)
+    saveButton.Text = "Save Instance"
+    saveButton.Position = UDim2.new(0.5, -70, 1, -60)
+    saveButton.Size = UDim2.new(0, 140, 0, 38)
+    saveButton.BackgroundColor3 = Color3.fromRGB(27, 140, 50)
+    saveButton.TextColor3 = Color3.new(1,1,1)
+    saveButton.Font = Enum.Font.SourceSansBold
+    saveButton.TextSize = 20
+    saveButton.BorderSizePixel = 0
+
+    -- Status
+    local statusLabel = Instance.new("TextLabel", frame)
+    statusLabel.Text = ""
+    statusLabel.Position = UDim2.new(0, 10, 1, -24)
+    statusLabel.Size = UDim2.new(1, -20, 0, 20)
+    statusLabel.BackgroundTransparency = 1
+    statusLabel.TextColor3 = Color3.new(1,1,1)
+    statusLabel.Font = Enum.Font.SourceSans
+    statusLabel.TextSize = 16
+    statusLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Close Button
+    local closeBtn = Instance.new("TextButton", frame)
+    closeBtn.Text = "X"
+    closeBtn.Position = UDim2.new(1, -34, 0, 2)
+    closeBtn.Size = UDim2.new(0, 32, 0, 32)
+    closeBtn.BackgroundColor3 = Color3.fromRGB(180,60,60)
+    closeBtn.TextColor3 = Color3.new(1,1,1)
+    closeBtn.Font = Enum.Font.SourceSansBold
+    closeBtn.TextSize = 20
+    closeBtn.BorderSizePixel = 0
+    closeBtn.MouseButton1Click:Connect(function()
+        gui:Destroy()
+    end)
+
+    saveButton.MouseButton1Click:Connect(function()
+        statusLabel.Text = "Saving..."
+        local options = {
+            SafeMode = safeMode,
+            ShowStatus = showStatus,
+            FilePath = fileNameBox.Text,
+            timeout = tonumber(timeoutBox.Text) or 10,
+            decomptype = decomptypeBox.Text,
+            noscripts = noscripts,
+            scriptcache = scriptcache,
+            SaveBytecode = saveBytecode,
+            IgnoreDefaultProperties = ignoreDefaultProps,
+            IgnoreNotArchivable = ignoreNotArchivable,
+        }
+        local ok, err = pcall(function()
+            saveinstanceFunc(options)
+        end)
+        if ok then
+            statusLabel.Text = "Save Complete!"
+        else
+            statusLabel.Text = "Error: " .. tostring(err)
+        end
+    end)
+
+    saveButton.Parent = frame
+    statusLabel.Parent = frame
+    closeBtn.Parent = frame
+
+    gui.Parent = game:GetService("CoreGui")
+end
+
+-- MAIN BODY
+--!native
+--!optimize 2
+--!divine-intellect
+-- https://discord.gg/wx4ThpAsmw
+
 local function string_find(s, pattern)
 	return string.find(s, pattern, nil, true)
 end
@@ -3082,5 +3345,14 @@ local function synsaveinstance(CustomOptions, CustomOptions2)
 		end
 	end
 end
+
+return synsaveinstance
+
+local function synsaveinstance(CustomOptions, CustomOptions2)
+    -- ... [entire original function body here, unchanged] ...
+end
+
+-- Launch the GUI automatically when script runs
+showSaveInstanceGui(synsaveinstance)
 
 return synsaveinstance
